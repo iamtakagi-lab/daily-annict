@@ -16,10 +16,10 @@ if (
 process.env.TZ = "Asia/Tokyo";
 
 import moment from "moment";
-import 'moment/locale/ja'
+import "moment/locale/ja";
 import Koa from "koa";
 import Router from "@koa/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import got from "got";
 import $ from "transform-ts";
@@ -121,7 +121,6 @@ interface Me {
   notifications_count: number;
 }
 
-
 // Annict Endpoint
 const annictApiEndpoint = "https://api.annict.com/v1" as const;
 
@@ -189,7 +188,7 @@ const getMe = async (token: string) => {
       Authorization: `Bearer ${token}`,
     },
   }).json<Me | null>();
-}
+};
 
 const app = new Koa();
 const router = new Router();
@@ -215,7 +214,7 @@ try {
         )[ext.slice(-1)[0]] ?? "application/octet-stream";
       ctx.body = fs.createReadStream(STATIC_DIR + "/" + filename);
     });
-} catch (e) { }
+} catch (e) {}
 
 /**
  * Annict 認可リクエスト URL
@@ -253,14 +252,13 @@ const getAnnictToken = async (code: string) => {
     .json<AnnictToken | null>();
 };
 
-const day = 24 * 60 * 60 * 1000
-const year = day * 365
+const day = 24 * 60 * 60 * 1000;
+const year = day * 365;
 
 /**
  * ログイン以外はインデックスで全て処理する
  */
 router.get("/", async (ctx, next) => {
-
   // 認可コードがクエリに付与されていたら
   const code = ctx.query["code"];
   if (code && typeof code === "string") {
@@ -270,7 +268,7 @@ router.get("/", async (ctx, next) => {
       path: "/",
       httpOnly: false,
       maxAge: year,
-      expires: new Date(Date.now() + year)
+      expires: new Date(Date.now() + year),
     });
     return ctx.redirect("/" + moment().format("YYYY/MM/DD"));
   }
@@ -298,7 +296,10 @@ router.get("/", async (ctx, next) => {
         <main>
           <nav>
             <h1>daily-annict</h1>
-            <span>Annict で「見てる」「見たい」を選択しているアニメの放送予定時間を日別に表示するカレンダー</span>
+            <span>
+              Annict
+              で「見てる」「見たい」を選択しているアニメの放送予定時間を日別に表示するカレンダー
+            </span>
           </nav>
           <a href="/login">Annict でログイン</a>
         </main>
@@ -313,21 +314,21 @@ router.get("/", async (ctx, next) => {
 router.get("/:year/:month/:day", async (ctx, next) => {
   const { year, month, day } = ctx.params;
   const date = new Date(Number(year), Number(month) - 1, Number(day));
-  const path = `/${moment(date).format('YYYY/MM/DD')}`
+  const path = `/${moment(date).format("YYYY/MM/DD")}`;
   if (path !== ctx.path) {
-      return ctx.redirect(path)
+    return ctx.redirect(path);
   }
-  const dateFormat = moment(date).format('YYYY/MM/DD (dddd)')
-  const yesterday = moment(date).add(-1, 'days').format('YYYY/MM/DD')
-  const yesterdayD = moment(date).add(-1, 'days').format('YYYY/MM/DD (ddd)')
-  const tomorrow = moment(date).add(1, 'days').format('YYYY/MM/DD')
-  const tomorrowD = moment(date).add(1, 'days').format('YYYY/MM/DD (ddd)')
+  const dateFormat = moment(date).format("YYYY/MM/DD (dddd)");
+  const yesterday = moment(date).add(-1, "days").format("YYYY/MM/DD");
+  const yesterdayD = moment(date).add(-1, "days").format("YYYY/MM/DD (ddd)");
+  const tomorrow = moment(date).add(1, "days").format("YYYY/MM/DD");
+  const tomorrowD = moment(date).add(1, "days").format("YYYY/MM/DD (ddd)");
   const token = ctx.cookies.get("annict_token");
   if (token && typeof token == "string") {
     const programsRes = await getPrograms(token, date);
-    const me = await getMe(token)
+    const me = await getMe(token);
     if (!programsRes || !me) return await next();
-    const programs = programsRes.programs
+    const programs = programsRes.programs;
     // 今日放送予定の番組
     const dailyPrograms = programs
       .filter(
@@ -335,8 +336,13 @@ router.get("/:year/:month/:day", async (ctx, next) => {
           program.episode &&
           program.started_at &&
           isAtDate(new Date(program.started_at), date)
-          // 時刻順に並べ替える
-      ).sort((a, b) => (new Date(a.started_at).getTime() > new Date(b.started_at).getTime() ? 1 : -1))
+        // 時刻順に並べ替える
+      )
+      .sort((a, b) =>
+        new Date(a.started_at).getTime() > new Date(b.started_at).getTime()
+          ? 1
+          : -1
+      );
     ctx.body = renderToStaticMarkup(
       <html lang="ja">
         <head>
@@ -353,16 +359,33 @@ router.get("/:year/:month/:day", async (ctx, next) => {
         </head>
         <body>
           <div id="app">
-            <a href={`/${yesterday}`} id="prev" className="prevnext"><span><span className="link">前の日: {yesterdayD}</span><br /><kbd>A</kbd></span></a>
+            <a href={`/${yesterday}`} id="prev" className="prevnext">
+              <span>
+                <span className="link">前の日: {yesterdayD}</span>
+                <br />
+                <kbd>A</kbd>
+              </span>
+            </a>
             <main>
               <nav>
                 <h1>daily-annict</h1>
-                <span>Annict で「見てる」「見たい」を選択しているアニメの放送予定時間を日別に表示するカレンダー</span>
+                <span>
+                  Annict
+                  で「見てる」「見たい」を選択しているアニメの放送予定時間を日別に表示するカレンダー
+                </span>
               </nav>
               <section id="me">
-                <img id="avatar" src={me.avatar_url} alt="" width={50} height={50} />
+                <img
+                  id="avatar"
+                  src={me.avatar_url}
+                  alt=""
+                  width={50}
+                  height={50}
+                />
                 <div className="items">
-                  <a href={`https://annict.com/@${me.username}`}>{me.name} (@{me.username})</a>
+                  <a href={`https://annict.com/@${me.username}`}>
+                    {me.name} (@{me.username})
+                  </a>
                   <a href="/logout">ログアウト</a>
                 </div>
               </section>
@@ -371,25 +394,49 @@ router.get("/:year/:month/:day", async (ctx, next) => {
                 {!dailyPrograms.length && <p>この日の放送予定はありません</p>}
                 <div id="programs">
                   {dailyPrograms &&
-                    dailyPrograms
-                      .map(({ work, episode, channel, started_at }, i) => {
+                    dailyPrograms.map(
+                      ({ work, episode, channel, started_at }, i) => {
                         return (
                           <div id="program" key={i}>
-                            <img src={work.images.recommended_url} alt="" height={`auto`} width={`31%`} />
+                            <img
+                              src={work.images.recommended_url}
+                              alt=""
+                              height={`auto`}
+                              width={`31%`}
+                            />
                             <div className="items">
-                              <a href={`https://annict.com/works/${work.id}`}>{work.title}</a>
-                              {episode && <a href={`https://annict.com/works/${work.id}/episodes/${episode.id}`}>{episode.number_text} {episode.title}</a>}
+                              <a href={`https://annict.com/works/${work.id}`}>
+                                {work.title}
+                              </a>
+                              {episode && (
+                                <a
+                                  href={`https://annict.com/works/${work.id}/episodes/${episode.id}`}
+                                >
+                                  {episode.number_text} {episode.title}
+                                </a>
+                              )}
                               <p>放送開始時期: {work.season_name_text}</p>
                               <p>{channel.name}</p>
-                              <p>{moment(new Date(started_at)).format('YYYY/MM/DD HH:mm')}</p>
+                              <p>
+                                {moment(new Date(started_at)).format(
+                                  "YYYY/MM/DD HH:mm"
+                                )}
+                              </p>
                             </div>
                           </div>
                         );
-                      })}
+                      }
+                    )}
                 </div>
               </section>
             </main>
-            <a href={`/${tomorrow}`} id="next" className="prevnext"><span><span className="link">次の日: {tomorrowD}</span><br /><kbd>D</kbd></span></a>
+            <a href={`/${tomorrow}`} id="next" className="prevnext">
+              <span>
+                <span className="link">次の日: {tomorrowD}</span>
+                <br />
+                <kbd>D</kbd>
+              </span>
+            </a>
           </div>
         </body>
       </html>
@@ -408,8 +455,8 @@ router.get("/login", async (ctx, next) => {
  * ログアウト
  */
 router.get("/logout", async (ctx, next) => {
-  ctx.cookies.set("annict_token", null)
-  ctx.redirect("/")
+  ctx.cookies.set("annict_token", null);
+  ctx.redirect("/");
 });
 
 app.use(router.routes());
