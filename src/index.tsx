@@ -214,7 +214,29 @@ try {
         )[ext.slice(-1)[0]] ?? "application/octet-stream";
       ctx.body = fs.createReadStream(STATIC_DIR + "/" + filename);
     });
-} catch (e) { }
+} catch (e) {}
+
+/**
+ * チャンネルロゴ assets
+ */
+try {
+  const STATIC_DIR = __dirname + "/../channel_logo";
+  const allowedFiles = fs.readdirSync(STATIC_DIR);
+
+  if (allowedFiles.length)
+    router.get("/channel_logo/:filename", async (ctx, next) => {
+      const filename = $.string.transformOrThrow(ctx.params.filename);
+      if (!allowedFiles.includes(filename)) return next();
+      const ext = filename.split(".");
+      ctx.type =
+        (
+          {
+            png: "image/png",
+          } as { [key: string]: string }
+        )[ext.slice(-1)[0]] ?? "application/octet-stream";
+      ctx.body = fs.createReadStream(STATIC_DIR + "/" + filename);
+    });
+} catch (e) {}
 
 /**
  * Annict 認可リクエスト URL
@@ -253,17 +275,20 @@ const getAnnictToken = async (code: string) => {
 };
 
 const Top: React.FC<{}> = ({}) => (
-    <div id="top">
-      <h1>daily-annict</h1>
-      <span>
-        Annict
-        で「見てる」「見たい」を選択しているアニメの放送予定時間を日別に表示するカレンダー
-      </span>
-      <span>
-        GitHub: <a href="https://github.com/iamtakagi/daily-annict">https://github.com/iamtakagi/daily-annict</a>
-      </span>
-    </div>
-)
+  <div id="top">
+    <h1>daily-annict</h1>
+    <span>
+      Annict
+      で「見てる」「見たい」を選択しているアニメの放送予定時間を日別に表示するカレンダー
+    </span>
+    <span>
+      GitHub:{" "}
+      <a href="https://github.com/iamtakagi/daily-annict">
+        https://github.com/iamtakagi/daily-annict
+      </a>
+    </span>
+  </div>
+);
 
 const day = 24 * 60 * 60 * 1000;
 const year = day * 365;
@@ -307,7 +332,7 @@ router.get("/", async (ctx, next) => {
       </head>
       <body>
         <main>
-          <Top/>
+          <Top />
           <a href="/login">Annict でログイン</a>
         </main>
       </body>
@@ -374,7 +399,7 @@ router.get("/:year/:month/:day", async (ctx, next) => {
               </span>
             </a>
             <main>
-              <Top/>
+              <Top />
               <section id="me">
                 <img
                   id="avatar"
@@ -417,7 +442,15 @@ router.get("/:year/:month/:day", async (ctx, next) => {
                                 </a>
                               )}
                               <p>放送開始時期: {work.season_name_text}</p>
-                              <p>{channel.name}</p>
+                              <span>
+                                <img
+                                  src={`/channel_logo/${channel.name}.png`}
+                                  alt=""
+                                  width={`31%`}
+                                  height={`auto`}
+                                />{" "}
+                                {channel.name}
+                              </span>
                               <p>
                                 {moment(new Date(started_at)).format(
                                   "YYYY/MM/DD HH:mm"
@@ -460,5 +493,8 @@ router.get("/logout", async (ctx, next) => {
   ctx.redirect("/");
 });
 
+/**
+ * Run
+ */
 app.use(router.routes());
 app.listen(process.env.PORT || 3000);
