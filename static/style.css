@@ -41,7 +41,7 @@ span {
     border-left: 1px solid #eee;
 }
 
-nav {
+#top {
     display: flex;
     flex-direction: column;
     margin-bottom: 1em;
