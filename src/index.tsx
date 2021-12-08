@@ -443,13 +443,20 @@ router.get("/:year/:month/:day", async (ctx, next) => {
                               )}
                               <p>放送開始時期: {work.season_name_text}</p>
                               <span>
-                                <img
-                                  src={`/channel_logo/${channel.name}.png`}
-                                  alt=""
+                                <object
+                                  data="/channel_logo/default.png"
+                                  type="image/png"
                                   width={`31%`}
                                   height={`auto`}
-                                />{" "}
-                                {channel.name}
+                                >
+                                  <img
+                                    src={`/channel_logo/${channel.name}.png`}
+                                    alt=""
+                                    width={`31%`}
+                                    height={`auto`}
+                                  />{" "}
+                                  {channel.name}
+                                </object>
                               </span>
                               <p>
                                 {moment(new Date(started_at)).format(
