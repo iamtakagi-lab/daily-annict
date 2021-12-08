@@ -19,11 +19,16 @@ import moment from "moment";
 import "moment/locale/ja";
 import Koa from "koa";
 import Router from "@koa/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import got from "got";
 import $ from "transform-ts";
 import fs from "fs";
+
+const baseUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://daily-annict.vercel.app"
+    : "http://localhost:3000";
 
 /**
  * チャンネル情報
@@ -443,20 +448,13 @@ router.get("/:year/:month/:day", async (ctx, next) => {
                               )}
                               <p>放送開始時期: {work.season_name_text}</p>
                               <span>
-                                <object
-                                  data="/channel_logo/default.png"
-                                  type="image/png"
+                                <img
+                                  src={`/channel_logo/${channel.name}.png`}
+                                  alt=""
                                   width={`31%`}
                                   height={`auto`}
-                                >
-                                  <img
-                                    src={`/channel_logo/${channel.name}.png`}
-                                    alt=""
-                                    width={`31%`}
-                                    height={`auto`}
-                                  />{" "}
-                                  {channel.name}
-                                </object>
+                                />{" "}
+                                {channel.name}
                               </span>
                               <p>
                                 {moment(new Date(started_at)).format(
