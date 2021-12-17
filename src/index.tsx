@@ -432,8 +432,8 @@ router.get("/:year/:month/:day", async (ctx, next) => {
                             <img
                               src={work.images.recommended_url}
                               alt=""
-                              height={`auto`}
-                              width={`31%`}
+                              height={`50%`}
+                              width={`50%`}
                             />
                             <div className="items">
                               <a href={`https://annict.com/works/${work.id}`}>
