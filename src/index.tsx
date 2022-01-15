@@ -153,7 +153,7 @@ interface ProgramsResponseObject {
 /**
  * アクセストークン
  */
-interface AnnictToken = {
+interface AccessToken {
   access_token: string;
   token_type: string;
   scope: string;
@@ -229,7 +229,7 @@ try {
         )[ext.slice(-1)[0]] ?? "application/octet-stream";
       ctx.body = fs.createReadStream(STATIC_DIR + "/" + filename);
     });
-} catch (e) {}
+} catch (e) { }
 
 /**
  * チャンネルロゴ assets
@@ -251,7 +251,7 @@ try {
         )[ext.slice(-1)[0]] ?? "application/octet-stream";
       ctx.body = fs.createReadStream(STATIC_DIR + "/" + filename);
     });
-} catch (e) {}
+} catch (e) { }
 
 /**
  * Annict 認可リクエスト URL
@@ -266,10 +266,10 @@ annictOAuthUrl.searchParams.set("scope", "read");
  * Annict アクセストークンを取得します
  * @param code 認可後に取得した認証コード
  */
-const getAnnictToken = async (code: string) => {
+const getAccessToken = async (code: string) => {
   const target = new URL(`${annictOauthApiEndpoint}/token`);
   return await got
-    .post<AnnictToken | null>(target.href, {
+    .post<AccessToken | null>(target.href, {
       responseType: "json",
       json: {
         client_id: annictClientId,
@@ -279,10 +279,10 @@ const getAnnictToken = async (code: string) => {
         code: code,
       },
     })
-    .json<AnnictToken | null>();
+    .json<AccessToken | null>();
 };
 
-const Top: React.FC<{}> = ({}) => (
+const Top: React.FC<{}> = ({ }) => (
   <div id="top">
     <h1>daily-annict</h1>
     <span>
@@ -308,9 +308,9 @@ router.get("/", async (ctx, next) => {
   // 認可コードがクエリに付与されていたら
   const code = ctx.query["code"];
   if (code && typeof code === "string") {
-    const annictToken = await getAnnictToken(code);
-    if (!annictToken) return await next();
-    ctx.cookies.set("annict_token", annictToken.access_token, {
+    const accessToken = await getAccessToken(code);
+    if (!accessToken) return await next();
+    ctx.cookies.set("annict_token", accessToken.access_token, {
       path: "/",
       httpOnly: false,
       maxAge: year,
