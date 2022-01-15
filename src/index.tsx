@@ -151,6 +151,16 @@ interface ProgramsResponseObject {
 }
 
 /**
+ * アクセストークン
+ */
+interface AnnictToken = {
+  access_token: string;
+  token_type: string;
+  scope: string;
+  created_at: number;
+};
+
+/**
  * 指定された日付がその日かを返します
  * @param someDate
  * @returns boolean
@@ -251,13 +261,6 @@ annictOAuthUrl.searchParams.set("client_id", annictClientId);
 annictOAuthUrl.searchParams.set("response_type", "code");
 annictOAuthUrl.searchParams.set("redirect_uri", annictRedirectUri);
 annictOAuthUrl.searchParams.set("scope", "read");
-
-type AnnictToken = {
-  access_token: string;
-  token_type: string;
-  scope: string;
-  created_at: number;
-};
 
 /**
  * Annict アクセストークンを取得します
