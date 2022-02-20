@@ -197,7 +197,7 @@ const getPrograms = async (token: string, date: Date) => {
 
 const getMe = async (token: string) => {
   const target = new URL(`${annictApiEndpoint}/me`);
-  return await got<ProgramsResponseObject | null>(target.href, {
+  return await got<Me | null>(target.href, {
     responseType: "json",
     headers: {
       Authorization: `Bearer ${token}`,
